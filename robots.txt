@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://panchindavid10-hub.github.io/muso-business-demo/sitemap.xml
