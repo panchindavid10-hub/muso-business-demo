@@ -18,9 +18,9 @@ Todas proceden de Pexels y están cubiertas por la [licencia Pexels](https://www
 
 Transformación realizada: conversión a RGB y WebP con Pillow, calidad 83. Sin texto añadido, generación de IA, sustitución de marcas ni modificación del contenido. Se inspeccionaron visualmente los siete archivos descargados.
 
-## Ilustración del avión
+## Ilustraciones de aeronaves
 
-Ilustración vectorial original incluida en las portadas en español e inglés. El SVG representa un avión bimotor genérico con siete grupos independientes para la animación de ensamblado y despiece. Se creó mediante geometría y gradientes SVG; no corresponde a un modelo comercial específico ni muestra marcas de fabricantes.
+Ilustraciones vectoriales originales incluidas en las portadas en español e inglés: una aeronave de ala fija con dos motores y un helicóptero civil genérico. Sus grupos independientes permiten animar el ensamblado y despiece de la estructura, la propulsión y los componentes de cada tipo de aeronave. Se crearon mediante geometría y gradientes SVG; no corresponden a modelos comerciales específicos ni muestran marcas de fabricantes. Son representaciones conceptuales y no acreditan inventario, compatibilidad o capacidad de mantenimiento.
 
 ## Tipografía
 

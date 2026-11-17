@@ -23,13 +23,23 @@ function setupAircraft() {
   const scene = document.querySelector('#aircraft-experience[data-aircraft-scene]');
   if (!scene) return;
 
-  const parts = [...scene.querySelectorAll('[data-aircraft-part]')].map((element) => {
+  const readPart = (element) => {
     const coordinate = (key) => {
       const value = Number(element.dataset[key]);
       return Number.isFinite(value) ? value : 0;
     };
     return { element, x: coordinate('explodeX'), y: coordinate('explodeY'), rotate: coordinate('explodeRotate') };
-  });
+  };
+  const models = [...scene.querySelectorAll('[data-aircraft-model]')].map((element) => ({
+    element,
+    name: element.dataset.aircraftModel,
+    parts: [...element.querySelectorAll('[data-aircraft-part]')].map(readPart),
+  }));
+  let selectedModel = models.find(({ element }) => !element.hasAttribute('hidden')) || models[0];
+  const selector = scene.querySelector('[data-aircraft-selector]');
+  const buttons = [...scene.querySelectorAll('[data-aircraft-select]')];
+  const family = scene.querySelector('[data-aircraft-family]');
+  const modelLabel = scene.querySelector('[data-aircraft-model-label]');
   const steps = [...scene.querySelectorAll('[data-aircraft-step]')];
   const state = scene.querySelector('[data-aircraft-state]');
   const progressBar = scene.querySelector('[data-aircraft-progress]');
@@ -44,7 +54,7 @@ function setupAircraft() {
   function paint(progress) {
     const amount = getExplosion(progress);
     scene.style.setProperty('--aircraft-explosion', String(amount));
-    for (const { element, x, y, rotate } of parts) {
+    for (const { element, x, y, rotate } of selectedModel?.parts || []) {
       if (staticScene) element.style.removeProperty('transform');
       else element.style.transform = `translate(${x * amount}px, ${y * amount}px) rotate(${rotate * amount}deg)`;
     }
@@ -70,15 +80,38 @@ function setupAircraft() {
     if (!staticScene && active && !frame) frame = window.requestAnimationFrame(render);
   }
 
+  function selectModel(name) {
+    const model = models.find((entry) => entry.name === name);
+    if (!model) return;
+    selectedModel = model;
+    models.forEach(({ element }) => element.toggleAttribute('hidden', element !== model.element));
+    buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.aircraftSelect === name)));
+    const key = name === 'fixed-wing' ? 'fixedWing' : 'helicopter';
+    for (const label of [family, modelLabel]) {
+      if (label?.dataset[key]) label.textContent = label.dataset[key];
+    }
+    if (frame) window.cancelAnimationFrame(frame);
+    frame = 0;
+    if (staticScene) paint(0);
+    else render();
+  }
+
   function updatePreference() {
     staticScene = preference.matches || shortViewport.matches;
     if (frame) window.cancelAnimationFrame(frame);
     frame = 0;
     scene.classList.toggle('is-ready', !staticScene);
     // Read after the class change, since the static scene removes the sticky scene's extra height.
-    if (staticScene) paint(0);
+    if (staticScene) {
+      models.forEach(({ parts }) => parts.forEach(({ element }) => element.style.removeProperty('transform')));
+      paint(0);
+    }
     else render();
   }
+
+  buttons.forEach((button) => button.addEventListener('click', () => selectModel(button.dataset.aircraftSelect)));
+  if (selector && models.length > 1) selector.hidden = false;
+  if (selectedModel) selectModel(selectedModel.name);
 
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(([entry]) => {
